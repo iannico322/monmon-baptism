@@ -149,3 +149,6 @@ html.cam-open,html.cam-open body{overflow:hidden}
 /* darker, easier-to-read bottom text */
 .gate .g-h{color:#1d3f58;text-shadow:0 1px 10px rgba(255,255,255,.7);font-weight:800}
 .scene .cdt{color:#1d3f58;text-shadow:0 1px 6px rgba(255,255,255,.75)}
+
+/* "I, [name]," always stays on one line: the name box fills only the space that is left */
+.pledge .w-name{width:min(13em,calc(100% - 2.6rem));vertical-align:baseline}
