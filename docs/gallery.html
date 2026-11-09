@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery – Baptism of Daimon</title>
+<script>document.documentElement.className="js";</script>
+<noscript><style>.gate{display:none!important}.locked,.locked body{overflow:auto!important}.rv{opacity:1!important;transform:none!important}</style></noscript>
+<link rel="stylesheet" href="static/style.css">
+<link rel="stylesheet" href="static/extra.css">
+</head>
+<body>
+<div class="skyfx" aria-hidden="true"><img class="s1" src="static/cloud1.webp" alt=""><img class="s2" src="static/cloud3.webp" alt=""><img class="s3" src="static/cloud2.webp" alt=""></div>
+
+<main class="wrap gal-wrap">
+
+  <section class="card cam-card">
+    <img class="art w2" src="static/wash2.webp" alt="">
+    <div class="in">
+      <p class="eyebrow">Share the day with us</p>
+      <h2>Gallery</h2>
+      <p class="sub">Take up to <b id="limitN">5</b> photos with the camera below. They'll appear in the gallery for everyone to see.</p>
+
+      <div class="cam" id="cam" hidden>
+        <div class="viewport">
+          <video id="video" playsinline muted autoplay></video>
+          <div class="flash" id="flash"></div>
+          <div class="count" id="shotCount"></div>
+        </div>
+        <div class="controls">
+          <button class="ctl" id="flipBtn" type="button" aria-label="Switch camera">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 7h13l-3-3M21 17H8l3 3"/></svg>
+          </button>
+          <button class="shutter" id="shutter" type="button" aria-label="Take photo"></button>
+          <button class="ctl" id="closeCam" type="button" aria-label="Close camera">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="shots" id="shots" aria-live="polite"></div>
+
+      <div class="cam-actions">
+        <button class="go" id="openCam" type="button">Open camera</button>
+        <button class="go" id="sendBtn" type="button" hidden>Send photos</button>
+        <label class="go alt" id="fileLabel" hidden>Use my phone's camera app
+          <input type="file" id="fileInput" accept="image/*" capture="environment" multiple hidden>
+        </label>
+      </div>
+      <p class="err" id="camMsg" role="status"></p>
+    </div>
+  </section>
+
+  <section class="gal-grid-wrap">
+    <h2 class="gal-h">Everyone's photos</h2>
+    <p class="gal-sub" id="galSub">Loading…</p>
+    <div class="gal-grid" id="grid">
+      <figure class="gi feat"><img src="static/gallery1.jpg" alt="Daimon in a white baptism outfit with a sky blue bow tie, surrounded by white roses, blue hydrangeas and a dove" loading="lazy"><figcaption>Daimon's baptism portrait</figcaption></figure>
+    </div>
+  </section>
+
+</main>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="x" id="lbClose" type="button" aria-label="Close">&times;</button>
+  <img id="lbImg" alt="">
+</div>
+
+<nav class="sitenav" aria-label="Pages">
+  <a href="index.html">Invitation</a>
+  <a href="godparent.html">Godparent</a>
+  <a href="gallery.html" aria-current="page">Gallery</a>
+</nav>
+<script src="config.js"></script><script src="static/gallery.js"></script>
+</body>
+</html>
