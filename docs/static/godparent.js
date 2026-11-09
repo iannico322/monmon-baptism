@@ -57,8 +57,9 @@
     document.getElementById("fallback").style.display = saved ? "none" : "block";
     document.getElementById("copyBtn").style.display = saved ? "none" : "inline-block";
     document.getElementById("msgText").textContent = asText(r);
+    var card = document.getElementById("pledge"); card.scrollTop = 0; card.scrollLeft = 0;
     done.classList.remove("show"); void done.offsetWidth; done.classList.add("show");
-    if (celebrate) { petals(); done.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"center"}); }
+    if (celebrate) { petals(); document.getElementById("pledge").scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"}); }
   }
   document.getElementById("editBtn").addEventListener("click", function(){
     done.style.display = "none"; form.style.display = "block"; btn.textContent = "Update my pledge";

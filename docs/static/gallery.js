@@ -147,7 +147,7 @@
   function addFigure(p, prepend){
     var f = document.createElement("figure"); f.className = "gi"; f.dataset.id = p.id;
     var im = document.createElement("img"); im.src = url(p.url); im.loading = "lazy"; im.alt = "Photo shared by a guest";
-    im.addEventListener("click", function(){ openLightbox(url(p.url), p.name || "Guest", "baptism-" + (p.name || "guest").replace(/[^\w]+/g, "-").toLowerCase() + "-" + p.id.slice(0, 6) + ".jpg"); });
+    im.addEventListener("click", function(){ openLightbox(url(p.url), p.name || "Guest", "baptism-" + (p.name || "guest").replace(/[^\w]+/g, "-").toLowerCase() + "-" + p.id.slice(0, 6) + ".jpg", true); });
     f.appendChild(im);
     var cap = document.createElement("figcaption"); cap.className = "by"; cap.textContent = p.name || "Guest"; f.appendChild(cap);
     if (adminKey) {
@@ -183,18 +183,46 @@
     refreshUI();
   }
 
-  var lb = { src: "", file: "photo.jpg" };
-  function openLightbox(src, name, file){
-    lb.src = src; lb.file = file;
-    $("lbImg").src = src; $("lbImg").alt = "Photo by " + name; $("lbName").textContent = name;
+  // ---------- watermark (drawn into the picture, so the viewed and the downloaded photo are the same) ----------
+  var WM_TITLE = "Baptism of Daimon", WM_DATE = "NOVEMBER 15, 2026";
+  var wmCache = {};
+  function watermarked(src){
+    if (!wmCache[src]) wmCache[src] = (async function(){
+      var res = await fetch(src); if (!res.ok) throw new Error("load");
+      var bmp = await createImageBitmap(await res.blob());
+      try { await Promise.all([document.fonts.load("40px Parisienne"), document.fonts.load("800 20px Nunito")]); } catch (e) {}
+      var W = bmp.width, H = bmp.height, c = document.createElement("canvas"); c.width = W; c.height = H;
+      var g = c.getContext("2d"); g.drawImage(bmp, 0, 0);
+      var s = Math.max(18, Math.round(Math.min(W, H) * 0.075)), band = s * 2.5;
+      var gr = g.createLinearGradient(0, H - band, 0, H); gr.addColorStop(0, "rgba(10,30,50,0)"); gr.addColorStop(1, "rgba(10,30,50,.55)");
+      g.fillStyle = gr; g.fillRect(0, H - band, W, band);
+      g.textAlign = "center"; g.fillStyle = "rgba(255,255,255,.95)"; g.shadowColor = "rgba(0,0,0,.5)"; g.shadowBlur = s * 0.25;
+      g.font = s + "px Parisienne, cursive"; g.fillText(WM_TITLE, W / 2, H - s * 1.0);
+      g.font = "800 " + Math.max(9, Math.round(s * 0.3)) + "px Nunito, sans-serif";
+      if ("letterSpacing" in g) g.letterSpacing = Math.round(s * 0.08) + "px";
+      g.fillText(WM_DATE, W / 2, H - s * 0.38);
+      var blob = await new Promise(function(r){ c.toBlob(r, "image/jpeg", 0.9); });
+      if (!blob) throw new Error("blob");
+      return { blob: blob, url: URL.createObjectURL(blob) };
+    })().catch(function(e){ delete wmCache[src]; throw e; });
+    return wmCache[src];
+  }
+
+  var lb = { src: "", file: "photo.jpg", wm: false };
+  function openLightbox(src, name, file, wm){
+    lb.src = src; lb.file = file; lb.wm = !!wm;
+    var img = $("lbImg"); img.alt = "Photo by " + name; $("lbName").textContent = name;
+    img.src = wm ? "" : src; img.style.opacity = wm ? "0" : "1";            // guest photos are shown with the watermark
     var b = $("lbDownload"); b.disabled = false; b.textContent = "Download";
     $("lightbox").hidden = false;
+    if (wm) watermarked(src).then(function(w){ if (lb.src === src) { img.src = w.url; img.style.opacity = "1"; } })
+      .catch(function(){ if (lb.src === src) { img.src = src; img.style.opacity = "1"; } });
   }
   $("lbDownload").addEventListener("click", async function(){
     var b = this; b.disabled = true; b.textContent = "Saving…";
     try {
-      var res = await fetch(lb.src); if (!res.ok) throw new Error();
-      var blob = await res.blob(), a = document.createElement("a");
+      var blob = lb.wm ? (await watermarked(lb.src)).blob : await (await fetch(lb.src)).blob();
+      var a = document.createElement("a");
       a.href = URL.createObjectURL(blob); a.download = lb.file;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
@@ -210,6 +238,22 @@
   $("lightbox").addEventListener("click", function(e){ if (e.target === this) this.hidden = true; });
   document.addEventListener("keydown", function(e){ if (e.key === "Escape") $("lightbox").hidden = true; });
   document.addEventListener("visibilitychange", function(){ if (document.hidden) stopCam(), refreshUI(); });
+
+  // triple-tap the "Gallery" title: forget everything this browser saved (name, photo count, ids) and reload
+  (function(){
+    var title = $("galTitle"), taps = 0, timer = null;
+    title.addEventListener("click", function(){
+      taps++; clearTimeout(timer); timer = setTimeout(function(){ taps = 0; }, 700);
+      if (taps < 3) return;
+      taps = 0;
+      try {
+        Object.keys(localStorage).filter(function(k){ return k.indexOf("baptism.") === 0; })
+          .forEach(function(k){ localStorage.removeItem(k); });
+      } catch (e) {}
+      stopCam(); say("Saved data cleared. Reloading…", true);
+      setTimeout(function(){ location.reload(); }, 600);
+    });
+  })();
 
   refreshUI();
   loadPhotos();

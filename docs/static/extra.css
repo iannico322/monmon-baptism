@@ -110,3 +110,9 @@ html.cam-open,html.cam-open body{overflow:hidden}
 .cam:not([hidden]) .count{top:calc(14px + env(safe-area-inset-top));right:14px}
 .cam .toast{position:absolute;left:50%;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:88%;background:rgba(20,45,65,.8);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:8px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s}
 .cam .toast.on{opacity:1}
+
+#galTitle{user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+
+/* cards must never scroll their own contents (the stamp animation used to push the top out of view) */
+.card{overflow:hidden;overflow:clip}
+.lightbox img{transition:opacity .2s}
