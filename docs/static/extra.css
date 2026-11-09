@@ -74,7 +74,7 @@ label.go{cursor:pointer}
 .namebox input{width:100%;font-family:var(--script);font-size:1.7rem;text-align:center;color:var(--blue);background:transparent;border:0;border-bottom:1.5px solid var(--ink);border-radius:0;padding:2px 6px;outline:none}
 .namebox input::placeholder{font-family:var(--serif);font-style:italic;font-size:1.05rem;color:#a7c0d3}
 .namebox input:focus{background:rgba(156,198,230,.3)}
-.gi figcaption.by{position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;background:linear-gradient(transparent,rgba(20,45,65,.72));color:#fff;font-family:var(--script);font-size:1.15rem;line-height:1.1;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.5);pointer-events:none}
+.gi figcaption.by{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);padding:3px 10px;border-radius:999px;background:rgba(20,45,65,.68);color:#fff;font-family:var(--sans);font-weight:700;font-size:.74rem;line-height:1.4;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;backdrop-filter:blur(3px)}
 
 /* narrow phones: keep the menu from running into the tagline */
 @media (max-width:430px){
@@ -84,3 +84,29 @@ label.go{cursor:pointer}
 
 /* sign-off: always a single line, scaling with the screen */
 .foot{font-size:clamp(1.3rem,7vw,1.9rem);white-space:nowrap}
+
+/* lightbox: name + download */
+.lightbox{grid-template-rows:1fr auto;gap:12px}
+.lightbox img{place-self:center;max-height:80vh}
+.lb-bar{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding-bottom:6px}
+.lb-name{color:#fff;font-family:var(--script);font-size:1.6rem;line-height:1.1}
+.lb-dl{border:0;cursor:pointer;background:#fff;color:var(--ink);padding:12px 24px;border-radius:999px;font-weight:800;font-size:.76rem;letter-spacing:.16em;text-transform:uppercase}
+.lb-dl:disabled{opacity:.7;cursor:default}
+.lb-dl:focus-visible{outline:3px solid var(--blue-2);outline-offset:3px}
+.gi.feat img{cursor:zoom-in}
+
+/* portrait: small circle */
+.gi.feat{background:none;box-shadow:none;overflow:visible;text-align:center;margin-bottom:18px}
+.gi.feat img{width:min(170px,46vw);height:min(170px,46vw);aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:50% 22%;margin:0 auto;border:4px solid #fff;box-shadow:0 14px 30px -12px rgba(29,63,88,.6)}
+.gi.feat figcaption{padding:8px 0 0;color:var(--ink-2);font-weight:700}
+
+/* full-screen camera */
+html.cam-open,html.cam-open body{overflow:hidden}
+.cam[hidden]{display:none!important}
+.cam:not([hidden]){position:fixed;inset:0;z-index:90;margin:0;display:flex;flex-direction:column;background:#000;height:100vh;height:100dvh}
+.cam:not([hidden]) .viewport{flex:1;max-height:none;aspect-ratio:auto;border-radius:0;margin:0;width:100%}
+.cam:not([hidden]) .controls{position:absolute;left:0;right:0;bottom:0;margin:0;padding:34px 28px calc(22px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.cam:not([hidden]) .ctl{background:rgba(255,255,255,.22);color:#fff;backdrop-filter:blur(4px)}
+.cam:not([hidden]) .count{top:calc(14px + env(safe-area-inset-top));right:14px}
+.cam .toast{position:absolute;left:50%;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:88%;background:rgba(20,45,65,.8);color:#fff;font-weight:700;font-size:.9rem;text-align:center;padding:8px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s}
+.cam .toast.on{opacity:1}
