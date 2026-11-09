@@ -201,7 +201,7 @@
   } else rv.forEach(function(el){ el.classList.add("in"); });
 
   // ---------- countdown ----------
-  var target = new Date("2026-11-15T10:00:00+08:00").getTime();
+  var target = new Date("2026-11-15T08:00:00+08:00").getTime();
   function tick(){
     var ms = target - Date.now(), txt;
     if (ms <= -3*36e5) txt = "Celebrated with love";
@@ -254,7 +254,7 @@
 
   // ---------- sheets ----------
   var sheet = document.getElementById("sheet"), sheetBg = document.getElementById("sheetBg"), sheetT = document.getElementById("sheetT"), sheetB = document.getElementById("sheetB"), lastOpener = null;
-  var CAL = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent("Baptism of Daimon Nicholas Etulle Caulin") + "&dates=20261115T020000Z/20261115T040000Z&location=" + encodeURIComponent("Our Lady of Consolacion Parish Church") + "&details=" + encodeURIComponent("Please arrive by 9:30 AM. Wear sky blue or white.");
+  var CAL = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent("Baptism of Daimon Nicholas Etulle Caulin") + "&dates=20261115T000000Z/20261115T020000Z&location=" + encodeURIComponent("Our Lady of Consolacion Parish Church") + "&details=" + encodeURIComponent("Please arrive by 7:30 AM. Wear sky blue or white.");
   function pledgeBtn(label){
     return document.getElementById("pledge")
       ? '<button class="go" type="button" data-go="pledge">' + label + '</button>'
@@ -267,7 +267,7 @@
       '<p>Under Church rules, a godparent is generally at least 16 years old and a baptized, confirmed Catholic who has received the Eucharist. Parishes can have their own requirements, so please check if you\u2019re unsure.</p>' +
       pledgeBtn('I\u2019d love to be his godparent') },
     event: { t: "Event Details", h:
-      '<dl><dt>Date</dt><dd>Sunday, November 15, 2026</dd><dt>Time</dt><dd>10:00 AM<br><small>Please arrive by 9:30 AM for registration and a quick briefing.</small></dd>' +
+      '<dl><dt>Date</dt><dd>Sunday, November 15, 2026</dd><dt>Time</dt><dd>8:00 AM<br><small>Please arrive by 7:30 AM for registration and a quick briefing.</small></dd>' +
       '<dt>Venue</dt><dd>Our Lady of Consolacion Parish Church</dd><dt>Dress</dt><dd>Sky blue or white</dd><dt>Countdown</dt><dd class="cdtxt"></dd></dl>' +
       '<p>Some parishes ask godparents to attend a short seminar or bring a confirmation certificate. We\u2019ll message you if anything is needed.</p>' +
       '<a class="lnk" href="' + CAL + '" target="_blank" rel="noopener">Add to Google Calendar</a><br>' +
@@ -332,7 +332,7 @@
   panel.innerHTML =
     '<button class="vs-x" type="button" aria-label="Close map">&times;</button>' +
     '<p class="vs-k">Venue</p><h3>' + PLACE + '</h3>' +
-    '<p class="vs-d">Sunday, November 15, 2026 &middot; 10:00 AM<br><small>Please arrive by 9:30 AM for registration.</small></p>' +
+    '<p class="vs-d">Sunday, November 15, 2026 &middot; 8:00 AM<br><small>Please arrive by 7:30 AM for registration.</small></p>' +
     '<div class="vs-map"><iframe title="Map of the venue" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>' +
     '<a class="vs-b" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + q + '">Open in Google Maps</a>' +
     '<a class="vs-b alt" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + q + '">Get directions</a>';

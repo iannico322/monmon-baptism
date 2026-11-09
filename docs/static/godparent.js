@@ -34,7 +34,7 @@
     return "";
   }
   function asText(r){
-    return "Godparent pledge – Baptism of Daimon Nicholas Etulle Caulin, Nov 15, 2026, 10:00 AM\n" +
+    return "Godparent pledge – Baptism of Daimon Nicholas Etulle Caulin, Nov 15, 2026, 8:00 AM\n" +
       "Role: " + r.role + "\nFull name: " + r.fullName + "\nMobile: " + r.phone +
       (r.email ? "\nEmail: " + r.email : "") + "\nRelationship: " + r.relation +
       "\nConfirmed Catholic: " + r.catholic + "\nAttending: " + r.attend +
@@ -154,7 +154,7 @@
     });
   }
   document.getElementById("copyListBtn").addEventListener("click", function(e){
-    var t = e.target, lines = ["GODPARENTS – Baptism of Daimon Nicholas Etulle Caulin", "Nov 15, 2026, 10:00 AM · Our Lady of Consolacion Parish Church", ""];
+    var t = e.target, lines = ["GODPARENTS – Baptism of Daimon Nicholas Etulle Caulin", "Nov 15, 2026, 8:00 AM · Our Lady of Consolacion Parish Church", ""];
     var ninong = current.filter(function(r){ return r.role === "Ninong"; }), ninang = current.filter(function(r){ return r.role !== "Ninong"; });
     lines.push("NINONG:"); ninong.forEach(function(r,i){ lines.push((i+1) + ". " + r.fullName); });
     lines.push("", "NINANG:"); ninang.forEach(function(r,i){ lines.push((i+1) + ". " + r.fullName); });
