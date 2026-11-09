@@ -122,7 +122,43 @@
 
   // ---------- gate ----------
   var gate = document.getElementById("gate");
+  // ---------- full screen (tapping the cross enters it; a small icon top-right toggles it) ----------
+  var fsBtn = null;
+  var fsOK = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  function fsEl(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function enterFs(){
+    var el = document.documentElement, f = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (!f) return;
+    try { var r = f.call(el); if (r && r.catch) r.catch(function(){}); } catch (e) {}
+  }
+  function exitFs(){
+    var f = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!f) return;
+    try { var r = f.call(document); if (r && r.catch) r.catch(function(){}); } catch (e) {}
+  }
+  function syncFs(){
+    if (!fsBtn) return;
+    var on = !!fsEl();
+    fsBtn.classList.toggle("is-full", on);
+    fsBtn.setAttribute("aria-label", on ? "Exit full screen" : "Enter full screen");
+    fsBtn.title = on ? "Exit full screen" : "Full screen";
+  }
+  function makeFsBtn(){
+    if (fsBtn || !fsOK) return;
+    fsBtn = document.createElement("button");
+    fsBtn.type = "button"; fsBtn.className = "fs-btn";
+    fsBtn.innerHTML =
+      '<svg class="i-expand" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>' +
+      '<svg class="i-shrink" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+    fsBtn.addEventListener("click", function(){ if (fsEl()) exitFs(); else enterFs(); });
+    document.body.appendChild(fsBtn); syncFs();
+  }
+  document.addEventListener("fullscreenchange", syncFs);
+  document.addEventListener("webkitfullscreenchange", syncFs);
+
   function openGate(){
+    enterFs();            // must run inside the tap on the cross
+    makeFsBtn();
     startBloom();
     gate.classList.add("open");
     root.classList.remove("locked");

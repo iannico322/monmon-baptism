@@ -128,3 +128,12 @@ html.cam-open,html.cam-open body{overflow:hidden}
 .lb-nav[hidden]{display:none}
 .lb-nav:hover{background:rgba(255,255,255,.38)}
 .lb-nav:focus-visible{outline:3px solid var(--blue-2);outline-offset:3px}
+
+/* small full-screen toggle, top right */
+.fs-btn{position:fixed;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));z-index:55;width:38px;height:38px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.7);color:var(--ink);cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 14px -4px rgba(29,63,88,.5);backdrop-filter:blur(4px);opacity:.85;transition:opacity .2s,transform .15s}
+.fs-btn:hover{opacity:1}.fs-btn:active{transform:scale(.92)}
+.fs-btn svg{width:20px;height:20px;grid-area:1/1}
+.fs-btn .i-shrink{display:none}
+.fs-btn.is-full .i-expand{display:none}
+.fs-btn.is-full .i-shrink{display:block}
+.fs-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
