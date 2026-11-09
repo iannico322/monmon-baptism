@@ -153,8 +153,68 @@
       act.appendChild(b); tr.appendChild(act); tb.appendChild(tr);
     });
   }
+  // ---------- export the list to Excel (.xlsx), or CSV if the Excel helper can't load ----------
+  var XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+  function loadXlsx(){
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    return new Promise(function(resolve, reject){
+      var s = document.createElement("script"); s.src = XLSX_URL; s.async = true;
+      s.onload = function(){ window.XLSX ? resolve(window.XLSX) : reject(new Error("xlsx")); };
+      s.onerror = function(){ reject(new Error("xlsx")); };
+      document.head.appendChild(s);
+    });
+  }
+  function fmtWhen(t){
+    if (!t) return "";
+    var d = new Date(t * 1000), p = function(n){ return (n < 10 ? "0" : "") + n; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  var HEAD = ["#", "Role", "Full name", "Mobile", "Email", "Relationship", "Confirmed Catholic", "Attending", "Blessing for Daimon", "Signed up"];
+  function exportRows(){
+    var rows = current.slice().sort(function(a, b){
+      return (a.role === b.role ? 0 : a.role === "Ninong" ? -1 : 1) || (a.submittedAt || 0) - (b.submittedAt || 0);
+    });
+    return rows.map(function(r, i){
+      return [i + 1, r.role || "", r.fullName || "", r.phone || "", r.email || "", r.relation || "",
+        r.catholic || "", r.attend && r.attend.indexOf("Yes") === 0 ? "Will be there" : "Sponsor only (can't attend)",
+        r.message || "", fmtWhen(r.submittedAt)];
+    });
+  }
+  function saveBlob(blob, name){
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  }
+  function csvCell(v){ v = String(v == null ? "" : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function downloadCsv(data){
+    var lines = [HEAD].concat(data).map(function(r){ return r.map(csvCell).join(","); });
+    saveBlob(new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" }), "godparents-daimon-baptism.csv");   // BOM so Excel reads the Filipino/accented letters correctly
+  }
+  document.getElementById("xlsBtn").addEventListener("click", async function(){
+    var btn = this, label = "Download Excel";
+    if (!current.length) { btn.textContent = "No pledges yet"; setTimeout(function(){ btn.textContent = label; }, 1800); return; }
+    btn.disabled = true; btn.textContent = "Preparing…";
+    var data = exportRows();
+    try {
+      var X = await loadXlsx();
+      var ws = X.utils.aoa_to_sheet([HEAD].concat(data));
+      ws["!cols"] = [{ wch: 4 }, { wch: 9 }, { wch: 28 }, { wch: 15 }, { wch: 26 }, { wch: 16 }, { wch: 18 }, { wch: 26 }, { wch: 50 }, { wch: 17 }];
+      var range = X.utils.decode_range(ws["!ref"]);
+      for (var R = 1; R <= range.e.r; R++) {                      // keep phone numbers as text so a leading 0 isn't lost
+        var c = ws[X.utils.encode_cell({ r: R, c: 3 })]; if (c) { c.t = "s"; c.v = String(c.v); }
+      }
+      ws["!autofilter"] = { ref: ws["!ref"] };
+      var wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, "Godparents");
+      X.writeFile(wb, "godparents-daimon-baptism.xlsx");
+      btn.textContent = "Saved!";
+    } catch (e) {
+      downloadCsv(data);                                         // offline / blocked: a CSV still opens in Excel
+      btn.textContent = "Saved (CSV)";
+    }
+    setTimeout(function(){ btn.disabled = false; btn.textContent = label; }, 2000);
+  });
+
   document.getElementById("copyListBtn").addEventListener("click", function(e){
-    var t = e.target, lines = ["GODPARENTS – Baptism of Daimon Nicholas Etulle Caulin", "Nov 15, 2026, 8:00 AM · Our Lady of Consolacion Parish Church", ""];
+    var t = e.target, lines = ["GODPARENTS – Baptism of Daimon Nicholas Etulle Caulin", "Nov 15, 2026, 8:00 AM · Our Lady of Consolation Parish Church", ""];
     var ninong = current.filter(function(r){ return r.role === "Ninong"; }), ninang = current.filter(function(r){ return r.role !== "Ninong"; });
     lines.push("NINONG:"); ninong.forEach(function(r,i){ lines.push((i+1) + ". " + r.fullName); });
     lines.push("", "NINANG:"); ninang.forEach(function(r,i){ lines.push((i+1) + ". " + r.fullName); });

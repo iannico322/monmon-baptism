@@ -254,7 +254,7 @@
 
   // ---------- sheets ----------
   var sheet = document.getElementById("sheet"), sheetBg = document.getElementById("sheetBg"), sheetT = document.getElementById("sheetT"), sheetB = document.getElementById("sheetB"), lastOpener = null;
-  var CAL = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent("Baptism of Daimon Nicholas Etulle Caulin") + "&dates=20261115T000000Z/20261115T020000Z&location=" + encodeURIComponent("Our Lady of Consolacion Parish Church") + "&details=" + encodeURIComponent("Please arrive by 7:30 AM. Wear sky blue or white.");
+  var CAL = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent("Baptism of Daimon Nicholas Etulle Caulin") + "&dates=20261115T000000Z/20261115T020000Z&location=" + encodeURIComponent("Our Lady of Consolation Parish Church") + "&details=" + encodeURIComponent("Please arrive by 7:30 AM. Wear sky blue or white.");
   function pledgeBtn(label){
     return document.getElementById("pledge")
       ? '<button class="go" type="button" data-go="pledge">' + label + '</button>'
@@ -268,7 +268,7 @@
       pledgeBtn('I\u2019d love to be his godparent') },
     event: { t: "Event Details", h:
       '<dl><dt>Date</dt><dd>Sunday, November 15, 2026</dd><dt>Time</dt><dd>8:00 AM<br><small>Please arrive by 7:30 AM for registration and a quick briefing.</small></dd>' +
-      '<dt>Venue</dt><dd>Our Lady of Consolacion Parish Church</dd><dt>Dress</dt><dd>Sky blue or white</dd><dt>Countdown</dt><dd class="cdtxt"></dd></dl>' +
+      '<dt>Venue</dt><dd>Our Lady of Consolation Parish Church</dd><dt>Dress</dt><dd>Sky blue or white</dd><dt>Countdown</dt><dd class="cdtxt"></dd></dl>' +
       '<p>Some parishes ask godparents to attend a short seminar or bring a confirmation certificate. We\u2019ll message you if anything is needed.</p>' +
       '<a class="lnk" href="' + CAL + '" target="_blank" rel="noopener">Add to Google Calendar</a><br>' +
       pledgeBtn('Sign the godparent pledge') }
@@ -324,7 +324,7 @@
   var venue = document.querySelector(".info .it:last-child");
   if (!venue) return;
   // Put the exact address here for a more accurate pin.
-  var PLACE = "Our Lady of Consolacion Parish Church";
+  var PLACE = "Our Lady of Consolation Parish Church";
   var q = encodeURIComponent(PLACE);
 
   var panel = document.createElement("aside");
