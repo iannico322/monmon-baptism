@@ -232,7 +232,7 @@ def photo_file(name):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5069))
     print(f"\n  Parents' key (open /godparent?key=KEY and /gallery?key=KEY): {ADMIN_KEY}\n")
     # Phones only allow the camera on https:// or localhost. HTTPS=1 serves a self-signed
     # cert (needs:  pip install cryptography) so guests on your Wi-Fi can use the camera.
