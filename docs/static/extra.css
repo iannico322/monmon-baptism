@@ -47,3 +47,23 @@ label.go{cursor:pointer}
 .lightbox[hidden]{display:none}
 .lightbox img{max-width:100%;max-height:92vh;border-radius:8px}
 .lightbox .x{position:absolute;top:14px;right:16px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.2);color:#fff;font-size:1.8rem;cursor:pointer}
+
+/* odd last menu button spans the full row */
+.menu .mb:last-child:nth-child(odd){grid-column:1/-1}
+
+/* venue map sidebar */
+.it-link{cursor:pointer}
+.it-link:focus-visible{outline:3px solid #2a74ad;outline-offset:2px;border-radius:12px}
+.venue-side{position:fixed;top:0;right:0;bottom:0;z-index:70;width:min(400px,92vw);overflow:auto;padding:30px 22px 26px;background:linear-gradient(#fff,#eaf5ff);box-shadow:-18px 0 50px -20px rgba(29,63,88,.55);border-radius:24px 0 0 24px;transform:translateX(105%);visibility:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s .35s;color:var(--ink)}
+.venue-side.show{transform:none;visibility:visible;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.venue-side h3{font-family:var(--script);font-weight:400;font-size:2.1rem;line-height:1.1;margin:0 0 8px;padding-right:44px}
+.vs-k{margin:0;font-weight:800;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue)}
+.vs-d{margin:0 0 14px;font-size:.95rem}
+.vs-d small{color:var(--muted)}
+.vs-map{border-radius:16px;overflow:hidden;box-shadow:0 14px 30px -14px rgba(29,63,88,.5);background:var(--sky-2);aspect-ratio:1/1}
+.vs-map iframe{width:100%;height:100%;border:0;display:block}
+.vs-x{position:absolute;top:12px;right:14px;width:40px;height:40px;border-radius:50%;border:0;background:var(--sky-2);color:var(--ink);font-size:1.5rem;line-height:1;cursor:pointer}
+.vs-b{display:block;margin-top:14px;text-align:center;text-decoration:none;background:var(--ink);color:#fff;padding:13px 18px;border-radius:2px;font-weight:800;font-size:.74rem;letter-spacing:.18em;text-transform:uppercase}
+.vs-b.alt{background:transparent;color:var(--ink);border:1.5px solid var(--ink);margin-top:10px}
+.vs-b:focus-visible,.vs-x:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+@media (max-width:600px){.venue-side{top:auto;left:0;width:auto;max-height:86vh;border-radius:24px 24px 0 0;transform:translateY(105%);box-shadow:0 -18px 50px -20px rgba(29,63,88,.55)}.venue-side.show{transform:none}}

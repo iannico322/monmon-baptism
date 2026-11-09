@@ -199,7 +199,7 @@
   function pledgeBtn(label){
     return document.getElementById("pledge")
       ? '<button class="go" type="button" data-go="pledge">' + label + '</button>'
-      : '<a class="go" href="godparent.html">' + label + '</a>';
+      : '';
   }
   var SHEETS = {
     about: { t: "About the Baptism", h:
@@ -258,4 +258,53 @@
   }
 
   window.Baptism = { petals: petals, reduce: reduce };
+})();
+
+// ---------- venue map sidebar (hover on desktop, tap on phones) ----------
+(function(){
+  var venue = document.querySelector(".info .it:last-child");
+  if (!venue) return;
+  // Put the exact address here for a more accurate pin.
+  var PLACE = "Our Lady of Consolacion Parish Church";
+  var q = encodeURIComponent(PLACE);
+
+  var panel = document.createElement("aside");
+  panel.className = "venue-side"; panel.id = "venueSide"; panel.setAttribute("aria-label", "Venue map");
+  panel.innerHTML =
+    '<button class="vs-x" type="button" aria-label="Close map">&times;</button>' +
+    '<p class="vs-k">Venue</p><h3>' + PLACE + '</h3>' +
+    '<p class="vs-d">Sunday, November 15, 2026 &middot; 10:00 AM<br><small>Please arrive by 9:30 AM for registration.</small></p>' +
+    '<div class="vs-map"><iframe title="Map of the venue" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>' +
+    '<a class="vs-b" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + q + '">Open in Google Maps</a>' +
+    '<a class="vs-b alt" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + q + '">Get directions</a>';
+  document.body.appendChild(panel);
+
+  venue.setAttribute("tabindex", "0"); venue.setAttribute("role", "button");
+  venue.setAttribute("aria-controls", "venueSide"); venue.setAttribute("aria-expanded", "false");
+  venue.classList.add("it-link");
+
+  var frame = panel.querySelector("iframe"), timer = null, pinned = false;
+  function open(){
+    clearTimeout(timer);
+    if (!frame.src) frame.src = "https://www.google.com/maps?q=" + q + "&output=embed";
+    panel.classList.add("show"); venue.setAttribute("aria-expanded", "true");
+  }
+  function close(){
+    clearTimeout(timer); pinned = false;
+    panel.classList.remove("show"); venue.setAttribute("aria-expanded", "false");
+  }
+  function later(){ if (pinned) return; clearTimeout(timer); timer = setTimeout(close, 300); }
+
+  var canHover = window.matchMedia && matchMedia("(hover:hover)").matches;
+  if (canHover) {
+    venue.addEventListener("mouseenter", open); venue.addEventListener("mouseleave", later);
+    panel.addEventListener("mouseenter", function(){ clearTimeout(timer); }); panel.addEventListener("mouseleave", later);
+  }
+  venue.addEventListener("click", function(){ if (panel.classList.contains("show") && pinned) close(); else { pinned = true; open(); } });
+  venue.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); venue.click(); } });
+  panel.querySelector(".vs-x").addEventListener("click", close);
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
+  document.addEventListener("pointerdown", function(e){
+    if (pinned && !panel.contains(e.target) && !venue.contains(e.target)) close();
+  });
 })();
