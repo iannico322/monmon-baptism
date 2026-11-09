@@ -77,6 +77,18 @@ def is_admin():
     return secrets.compare_digest(request.args.get("key", ""), ADMIN_KEY)
 
 
+@app.errorhandler(Exception)
+def on_error(e):
+    """API errors come back as JSON (the page shows the message) and the traceback goes to the server log."""
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        if request.path.startswith(("/api/", "/photos/")):
+            return jsonify(error=e.description), e.code
+        return e
+    app.logger.exception("Unhandled error on %s %s", request.method, request.path)
+    return jsonify(error=f"Server error ({type(e).__name__}: {e})"), 500
+
+
 # ---------- local preview of the static site ----------
 @app.get("/")
 def home():
