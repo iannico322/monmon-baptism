@@ -186,8 +186,9 @@
     seal.addEventListener("pointerup", release);
     seal.addEventListener("pointercancel", cancelHold);
     seal.addEventListener("contextmenu", function(e){ e.preventDefault(); });
-    seal.addEventListener("click", function(e){          // keyboard users (Enter / Space) open it straight away
-      if (e.detail === 0 && !opened) { opened = true; seal.classList.add("holding"); openGate(); }
+    seal.addEventListener("click", function(e){ e.preventDefault(); });   // a plain click or tap never opens it
+    seal.addEventListener("keydown", function(e){                          // keyboard users: Enter / Space
+      if ((e.key === "Enter" || e.key === " ") && !e.repeat && !opened) { e.preventDefault(); opened = true; seal.classList.add("holding"); openGate(); }
     });
     seal.focus({preventScroll:true});
   }
