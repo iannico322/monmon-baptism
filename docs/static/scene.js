@@ -166,8 +166,30 @@
     setTimeout(function(){ gate.style.display = "none"; }, reduce ? 50 : 1700);
   }
   if (gate) {
-    document.getElementById("openBtn").addEventListener("click", openGate);
-    document.getElementById("openBtn").focus({preventScroll:true});
+    // press and hold the seal: a ring fills, and the invitation opens when it is full
+    var seal = document.getElementById("openBtn"), HOLD_MS = reduce ? 400 : 1100, holdTimer = null, opened = false;
+    function cancelHold(){ clearTimeout(holdTimer); holdTimer = null; if (!opened) seal.classList.remove("holding"); }
+    function finishHold(){
+      holdTimer = null; if (opened) return; opened = true;
+      openGate();                      // (full screen is requested again on release, which touch screens require)
+    }
+    seal.addEventListener("pointerdown", function(e){
+      if (opened || (e.pointerType === "mouse" && e.button !== 0)) return;
+      try { seal.setPointerCapture(e.pointerId); } catch (err) {}
+      seal.classList.add("holding");
+      clearTimeout(holdTimer); holdTimer = setTimeout(finishHold, HOLD_MS);
+    });
+    function release(){
+      if (opened) { if (!fsEl()) enterFs(); }   // finger lifted: a fresh tap gesture lets touch browsers go full screen
+      else cancelHold();
+    }
+    seal.addEventListener("pointerup", release);
+    seal.addEventListener("pointercancel", cancelHold);
+    seal.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+    seal.addEventListener("click", function(e){          // keyboard users (Enter / Space) open it straight away
+      if (e.detail === 0 && !opened) { opened = true; seal.classList.add("holding"); openGate(); }
+    });
+    seal.focus({preventScroll:true});
   }
 
   // ---------- reveal ----------
