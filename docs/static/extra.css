@@ -120,3 +120,11 @@ html.cam-open,html.cam-open body{overflow:hidden}
 /* parents' list */
 .rolechip{font-weight:800;color:var(--blue)}
 .stat b{font-family:var(--sans);font-weight:800;font-variant-numeric:lining-nums;font-size:2.2rem}
+
+/* lightbox: previous / next */
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.22);color:#fff;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(4px);z-index:2}
+.lb-nav svg{width:24px;height:24px}
+.lb-nav.prev{left:10px}.lb-nav.next{right:10px}
+.lb-nav[hidden]{display:none}
+.lb-nav:hover{background:rgba(255,255,255,.38)}
+.lb-nav:focus-visible{outline:3px solid var(--blue-2);outline-offset:3px}

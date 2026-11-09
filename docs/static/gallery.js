@@ -147,7 +147,8 @@
   function addFigure(p, prepend){
     var f = document.createElement("figure"); f.className = "gi"; f.dataset.id = p.id;
     var im = document.createElement("img"); im.src = url(p.url); im.loading = "lazy"; im.alt = "Photo shared by a guest";
-    im.addEventListener("click", function(){ openLightbox(url(p.url), p.name || "Guest", "baptism-" + (p.name || "guest").replace(/[^\w]+/g, "-").toLowerCase() + "-" + p.id.slice(0, 6) + ".jpg", true); });
+    f._lb = { src: url(p.url), name: p.name || "Guest", file: "baptism-" + (p.name || "guest").replace(/[^\w]+/g, "-").toLowerCase() + "-" + p.id.slice(0, 6) + ".jpg", wm: true };
+    im.addEventListener("click", function(){ openLightbox(f); });
     f.appendChild(im);
     var cap = document.createElement("figcaption"); cap.className = "by"; cap.textContent = p.name || "Guest"; f.appendChild(cap);
     if (adminKey) {
@@ -208,8 +209,17 @@
     return wmCache[src];
   }
 
-  var lb = { src: "", file: "photo.jpg", wm: false };
-  function openLightbox(src, name, file, wm){
+  var lb = { src: "", file: "photo.jpg", wm: false, fig: null };
+  function lbItems(){ return Array.prototype.filter.call($("grid").querySelectorAll(".gi"), function(el){ return el._lb; }); }
+  function lbGo(d){
+    var list = lbItems(), i = list.indexOf(lb.fig);
+    if (i < 0 || list.length < 2) return;
+    openLightbox(list[(i + d + list.length) % list.length]);
+  }
+  function openLightbox(fig){
+    var d = fig._lb, src = d.src, name = d.name, file = d.file, wm = d.wm;
+    lb.fig = fig;
+    var multi = lbItems().length > 1; $("lbPrev").hidden = $("lbNext").hidden = !multi;
     lb.src = src; lb.file = file; lb.wm = !!wm;
     var img = $("lbImg"); img.alt = "Photo by " + name; $("lbName").textContent = name;
     img.src = wm ? "" : src; img.style.opacity = wm ? "0" : "1";            // guest photos are shown with the watermark
@@ -233,10 +243,29 @@
     setTimeout(function(){ b.disabled = false; b.textContent = "Download"; }, 2000);
   });
   var featImg = document.querySelector(".gi.feat img");
-  if (featImg) { featImg.addEventListener("click", function(){ openLightbox(featImg.src, "Daimon's baptism portrait", "daimon-baptism-portrait.webp"); }); }
+  if (featImg) {
+    var featFig = featImg.closest(".gi");
+    featFig._lb = { src: featImg.src, name: "Daimon's baptism portrait", file: "daimon-baptism-portrait.webp", wm: false };
+    featImg.addEventListener("click", function(){ openLightbox(featFig); });
+  }
+  $("lbPrev").addEventListener("click", function(e){ e.stopPropagation(); lbGo(-1); });
+  $("lbNext").addEventListener("click", function(e){ e.stopPropagation(); lbGo(1); });
+  (function(){   // swipe left / right on phones
+    var x0 = null, y0 = null, box = $("lightbox");
+    box.addEventListener("touchstart", function(e){ var t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+    box.addEventListener("touchend", function(e){
+      if (x0 === null) return; var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) lbGo(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  })();
   $("lbClose").addEventListener("click", function(){ $("lightbox").hidden = true; });
   $("lightbox").addEventListener("click", function(e){ if (e.target === this) this.hidden = true; });
-  document.addEventListener("keydown", function(e){ if (e.key === "Escape") $("lightbox").hidden = true; });
+  document.addEventListener("keydown", function(e){
+    if ($("lightbox").hidden) return;
+    if (e.key === "Escape") $("lightbox").hidden = true;
+    else if (e.key === "ArrowLeft") lbGo(-1);
+    else if (e.key === "ArrowRight") lbGo(1);
+  });
   document.addEventListener("visibilitychange", function(){ if (document.hidden) stopCam(), refreshUI(); });
 
   // triple-tap the "Gallery" title: forget everything this browser saved (name, photo count, ids) and reload
