@@ -67,3 +67,20 @@ label.go{cursor:pointer}
 .vs-b.alt{background:transparent;color:var(--ink);border:1.5px solid var(--ink);margin-top:10px}
 .vs-b:focus-visible,.vs-x:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 @media (max-width:600px){.venue-side{top:auto;left:0;width:auto;max-height:86vh;border-radius:24px 24px 0 0;transform:translateY(105%);box-shadow:0 -18px 50px -20px rgba(29,63,88,.55)}.venue-side.show{transform:none}}
+
+/* guest name field + name on photos */
+.namebox{max-width:340px;margin:4px auto 16px;text-align:center}
+.namebox label{display:block;font-weight:800;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.namebox input{width:100%;font-family:var(--script);font-size:1.7rem;text-align:center;color:var(--blue);background:transparent;border:0;border-bottom:1.5px solid var(--ink);border-radius:0;padding:2px 6px;outline:none}
+.namebox input::placeholder{font-family:var(--serif);font-style:italic;font-size:1.05rem;color:#a7c0d3}
+.namebox input:focus{background:rgba(156,198,230,.3)}
+.gi figcaption.by{position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;background:linear-gradient(transparent,rgba(20,45,65,.72));color:#fff;font-family:var(--script);font-size:1.15rem;line-height:1.1;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.5);pointer-events:none}
+
+/* narrow phones: keep the menu from running into the tagline */
+@media (max-width:430px){
+  .menu{top:71%;gap:1.6cqw 4.5cqw}
+  .mb{min-height:34px;padding:0 2.2cqw}
+}
+
+/* sign-off: always a single line, scaling with the screen */
+.foot{font-size:clamp(1.3rem,7vw,1.9rem);white-space:nowrap}

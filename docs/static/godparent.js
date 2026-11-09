@@ -12,6 +12,7 @@
 
   function getId(){ try { return localStorage.getItem(ID_KEY) || ""; } catch (e) { return ""; } }
   function setId(v){ try { localStorage.setItem(ID_KEY, v); } catch (e) {} }
+  function rememberName(n){ try { if (n) localStorage.setItem("baptism.name", n); } catch (e) {} }
 
   function val(name){
     var el = form.elements[name]; if (!el) return "";
@@ -83,9 +84,9 @@
     btn.disabled = true; btn.textContent = "Signing…";
     var saved = false, payload = Object.assign({}, r, { id: getId() });
     try {
-      var data = await send(payload); setId(data.id); saved = true;
+      var data = await send(payload); setId(data.id); rememberName(r.fullName); saved = true;
     } catch (err) {
-      try { await new Promise(function(res){ setTimeout(res, 700); }); var d2 = await send(payload); setId(d2.id); saved = true; }
+      try { await new Promise(function(res){ setTimeout(res, 700); }); var d2 = await send(payload); setId(d2.id); rememberName(r.fullName); saved = true; }
       catch (e2) { if (e2 && e2.message && !/Failed to fetch|NetworkError|Load failed/i.test(e2.message)) errEl.textContent = e2.message; }
     }
     btn.disabled = false; btn.textContent = "Sign & send";
@@ -99,7 +100,7 @@
     try {
       var res = await fetch(API + "/api/godparents/" + encodeURIComponent(id));
       if (!res.ok) return;
-      var r = await res.json(); fillForm(r); showDone(r, true, false);
+      var r = await res.json(); fillForm(r); rememberName(r.fullName); showDone(r, true, false);
     } catch (e) {}
   })();
 

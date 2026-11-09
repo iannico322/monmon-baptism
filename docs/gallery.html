@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="./icon.png" type="image/png">
+<link rel="apple-touch-icon" href="./icon.png">
 <title>Gallery – Baptism of Daimon</title>
 <script>document.documentElement.className="js";</script>
 <noscript><style>.gate{display:none!important}.locked,.locked body{overflow:auto!important}.rv{opacity:1!important;transform:none!important}</style></noscript>
@@ -19,7 +21,12 @@
     <div class="in">
       <p class="eyebrow">Share the day with us</p>
       <h2>Gallery</h2>
-      <p class="sub">Take up to <b id="limitN">5</b> photos with the camera below. They'll appear in the gallery for everyone to see.</p>
+      <p class="sub">Take up to <b id="limitN">5</b> photos with the camera below. Each photo is sent automatically the moment you take it, and appears in the gallery for everyone to see.</p>
+
+      <div class="namebox">
+        <label for="guestName">Your name</label>
+        <input id="guestName" type="text" maxlength="60" autocomplete="name" placeholder="type your name to start">
+      </div>
 
       <div class="cam" id="cam" hidden>
         <div class="viewport">
@@ -42,7 +49,6 @@
 
       <div class="cam-actions">
         <button class="go" id="openCam" type="button">Open camera</button>
-        <button class="go" id="sendBtn" type="button" hidden>Send photos</button>
         <label class="go alt" id="fileLabel" hidden>Use my phone's camera app
           <input type="file" id="fileInput" accept="image/*" capture="environment" multiple hidden>
         </label>

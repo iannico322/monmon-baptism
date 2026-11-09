@@ -166,7 +166,7 @@ def with_guest_cookie(resp, gid, is_new):
 
 
 def public(p):
-    return {"id": p["id"], "url": f"/photos/{p['id']}.jpg", "ts": p["ts"]}
+    return {"id": p["id"], "url": f"/photos/{p['id']}.jpg", "ts": p["ts"], "name": p.get("name", "")}
 
 
 @app.get("/api/photos")
@@ -185,6 +185,9 @@ def photos_list():
 def photos_upload():
     gid, new = guest_id()
     files = request.files.getlist("photos")
+    name = " ".join(request.form.get("name", "").split())[:60]
+    if not name:
+        return jsonify(error="Please type your name first."), 400
     if not files:
         return jsonify(error="No photos received."), 400
     with lock:
@@ -201,7 +204,7 @@ def photos_upload():
                 continue  # only real JPEGs, size-capped
             pid = uuid.uuid4().hex
             (PHOTOS / f"{pid}.jpg").write_bytes(data)
-            rec = {"id": pid, "guest": gid, "ts": time.time()}
+            rec = {"id": pid, "guest": gid, "name": name, "ts": time.time()}
             rows.append(rec)
             added.append(public(rec))
         if not added:

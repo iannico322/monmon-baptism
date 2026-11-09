@@ -11,36 +11,41 @@
   var MAX_SIDE = 1280;
 
   var video = $("video"), cam = $("cam"), shotsEl = $("shots"), msg = $("camMsg");
-  var openBtn = $("openCam"), sendBtn = $("sendBtn"), shutter = $("shutter");
+  var openBtn = $("openCam"), shutter = $("shutter");
   var stream = null, facing = "environment";
   var remaining = 5, limit = 5;
-  var pending = [];            // [{blob, url}] taken but not yet sent
+  var mine = [];               // photos this guest sent in this visit
   var sending = false, fallback = !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
+  var NAME_KEY = "baptism.name", nameIn = $("guestName");
+  function storedName(){ try { return localStorage.getItem(NAME_KEY) || ""; } catch (e) { return ""; } }
+  function cleanName(){ return nameIn.value.replace(/\s+/g, " ").trim(); }
+  nameIn.value = storedName();
+  nameIn.addEventListener("input", function(){ try { localStorage.setItem(NAME_KEY, cleanName()); } catch (e) {} });
+  function requireName(){
+    if (cleanName()) return true;
+    say("Please type your name first, so everyone knows who took the photo.");
+    nameIn.focus(); return false;
+  }
   function say(t, ok){ msg.textContent = t || ""; msg.style.color = ok ? "var(--ink)" : ""; }
-  function left(){ return remaining - pending.length; }
 
   // ---------- UI state ----------
   function refreshUI(){
     $("limitN").textContent = limit;
-    $("shotCount").textContent = left() + " left";
-    shutter.disabled = left() <= 0 || sending;
-    sendBtn.hidden = pending.length === 0;
-    sendBtn.disabled = sending;
-    sendBtn.textContent = sending ? "Sending…" : "Send " + pending.length + (pending.length === 1 ? " photo" : " photos");
+    $("shotCount").textContent = remaining + " left";
+    shutter.disabled = remaining <= 0 || sending;
     var used = remaining <= 0;
     openBtn.hidden = !!stream || used;
     $("fileLabel").hidden = used || !!stream || !fallback;
-    if (used && !pending.length) say("You've used all " + limit + " of your photos. Thank you!", true);
+    if (used && !msg.textContent) say("You've used all " + limit + " of your photos. Salamat po!", true);
     shotsEl.textContent = "";
-    pending.forEach(function(p, i){
+    mine.forEach(function(p, i){
       var f = document.createElement("div"); f.className = "shot";
       var im = document.createElement("img"); im.src = url(p.url); im.alt = "Your photo " + (i + 1);
-      var x = document.createElement("button"); x.type = "button"; x.className = "rm"; x.setAttribute("aria-label", "Delete photo " + (i + 1)); x.textContent = "×";
-      x.addEventListener("click", function(){ if (sending) return; URL.revokeObjectURL(p.url); pending.splice(i, 1); refreshUI(); });
-      f.appendChild(im); f.appendChild(x); shotsEl.appendChild(f);
+      f.appendChild(im); shotsEl.appendChild(f);
     });
   }
+
 
   // ---------- camera ----------
   async function startCam(){
@@ -68,7 +73,8 @@
     if (stream) stream.getTracks().forEach(function(t){ t.stop(); });
     stream = null; video.srcObject = null; cam.hidden = true;
   }
-  openBtn.addEventListener("click", function(){ if (left() > 0) startCam(); });
+  openBtn.addEventListener("click", function(){ if (remaining > 0 && requireName()) startCam(); });
+  $("fileLabel").addEventListener("click", function(e){ if (!requireName()) e.preventDefault(); });
   $("closeCam").addEventListener("click", function(){ stopCam(); refreshUI(); });
   $("flipBtn").addEventListener("click", function(){ facing = facing === "user" ? "environment" : "user"; startCam(); });
 
@@ -79,52 +85,47 @@
     c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
     return c;
   }
-  async function addBlob(blob){
-    pending.push({ blob: blob, url: URL.createObjectURL(blob) });
+  // ---------- take a photo -> it is sent right away ----------
+  async function sendOne(blob){
+    if (!requireName()) return false;
+    sending = true; say("Sending…", true); refreshUI();
+    var ok = false, fd = new FormData();
+    fd.append("name", cleanName());
+    fd.append("photos", blob, "photo.jpg");
+    try {
+      var res = await fetch(API + "/api/photos", { method: "POST", body: fd, headers: { "X-Guest": guest() } });
+      var data = await res.json().catch(function(){ return {}; });
+      if (!res.ok) throw new Error(data.error || "Upload failed.");
+      remaining = data.remaining; mine.push(data.photos[0]); ok = true;
+      say(remaining > 0 ? "Sent! " + remaining + (remaining === 1 ? " photo" : " photos") + " left." : "Sent! You've used all " + limit + " photos. Salamat po!", true);
+      if (remaining <= 0) stopCam();
+      loadPhotos();
+    } catch (err) {
+      say(err && err.message && !/fetch/i.test(err.message) ? err.message : "Couldn't send that photo. Check your connection and try again.");
+    }
+    sending = false; refreshUI(); return ok;
   }
 
   shutter.addEventListener("click", async function(){
-    if (left() <= 0 || !video.videoWidth) return;
+    if (remaining <= 0 || sending || !video.videoWidth) return;
+    if (!requireName()) return;
     var fl = $("flash"); fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go");
     var blob = await toBlob(drawScaled(video, video.videoWidth, video.videoHeight));
     if (!blob) { say("Couldn't capture that one. Try again."); return; }
-    await addBlob(blob); say("");
-    if (left() <= 0) stopCam();
-    refreshUI();
+    await sendOne(blob);
   });
 
   // phone camera app fallback (works over plain http too)
   $("fileInput").addEventListener("change", async function(e){
     var files = Array.prototype.slice.call(e.target.files || []);
     e.target.value = "";
-    for (var i = 0; i < files.length && left() > 0; i++) {
+    for (var i = 0; i < files.length && remaining > 0; i++) {
       try {
         var bmp = await createImageBitmap(files[i], { imageOrientation: "from-image" });
         var blob = await toBlob(drawScaled(bmp, bmp.width, bmp.height));
-        if (blob) await addBlob(blob);
-      } catch (err) { say("One of those files wasn't a usable photo."); }
+        if (!blob || !(await sendOne(blob))) break;
+      } catch (err) { say("One of those files wasn't a usable photo."); break; }
     }
-    refreshUI();
-  });
-
-  // ---------- upload ----------
-  sendBtn.addEventListener("click", async function(){
-    if (!pending.length || sending) return;
-    sending = true; say(""); refreshUI();
-    var fd = new FormData();
-    pending.forEach(function(p, i){ fd.append("photos", p.blob, "photo" + i + ".jpg"); });
-    try {
-      var res = await fetch(API + "/api/photos", { method: "POST", body: fd, headers: { "X-Guest": guest() } });
-      var data = await res.json().catch(function(){ return {}; });
-      if (!res.ok) throw new Error(data.error || "Upload failed.");
-      pending.forEach(function(p){ URL.revokeObjectURL(p.url); });
-      pending = []; remaining = data.remaining; stopCam();
-      say("Salamat po! Your photos were added to the gallery.", true);
-      await loadPhotos();
-    } catch (err) {
-      say(err && err.message && !/fetch/i.test(err.message) ? err.message : "Couldn't send. Check your connection and try again.");
-    }
-    sending = false; refreshUI();
   });
 
   // ---------- gallery grid ----------
@@ -134,6 +135,7 @@
     var im = document.createElement("img"); im.src = url(p.url); im.loading = "lazy"; im.alt = "Photo shared by a guest";
     im.addEventListener("click", function(){ $("lbImg").src = url(p.url); $("lightbox").hidden = false; });
     f.appendChild(im);
+    if (p.name) { var cap = document.createElement("figcaption"); cap.className = "by"; cap.textContent = p.name; f.appendChild(cap); }
     if (adminKey) {
       var d = document.createElement("button"); d.type = "button"; d.className = "rmphoto"; d.textContent = "Remove";
       d.addEventListener("click", async function(){
