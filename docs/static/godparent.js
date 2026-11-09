@@ -138,7 +138,7 @@
     current.forEach(function(r){
       var tr = document.createElement("tr"), nameCell = td(r.fullName);
       if (r.message){ var m = document.createElement("div"); m.style.cssText = "color:var(--muted);font-style:italic;font-size:.82rem;margin-top:3px"; m.textContent = "“" + r.message + "”"; nameCell.appendChild(m); }
-      tr.appendChild(nameCell); tr.appendChild(td(r.role, "tag")); tr.appendChild(td(r.phone)); tr.appendChild(td(r.relation)); tr.appendChild(td(r.catholic));
+      tr.appendChild(nameCell); tr.appendChild(td(r.role, "rolechip")); tr.appendChild(td(r.phone)); tr.appendChild(td(r.relation)); tr.appendChild(td(r.catholic));
       tr.appendChild(td(r.attend && r.attend.indexOf("Yes") === 0 ? "Yes" : "Sponsor only"));
       var act = document.createElement("td"), b = document.createElement("button"); b.className = "del"; b.type = "button"; b.textContent = "Remove";
       b.addEventListener("click", async function(){
