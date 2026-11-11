@@ -268,14 +268,47 @@
       pledgeBtn('I\u2019d love to be his godparent') },
     event: { t: "Event Details", h:
       '<dl><dt>Date</dt><dd>Sunday, November 15, 2026</dd><dt>Time</dt><dd>8:00 AM<br><small>Please arrive by 7:30 AM for registration and a quick briefing.</small></dd>' +
-      '<dt>Venue</dt><dd>Our Lady of Consolation Parish Church</dd><dt>Dress</dt><dd>Sky blue or white</dd><dt>Countdown</dt><dd class="cdtxt"></dd></dl>' +
+      '<dt>Venue</dt><dd>Our Lady of Consolation Parish Church</dd><dt>Reception</dt><dd>Marvilla Beach Resort, Opol<br><button class="lnk lnk-btn" type="button" data-open="reception">See photos &amp; map</button></dd><dt>Dress</dt><dd>Sky blue or white<br><small>You can bring an extra outfit if you wish to swim at the reception.</small></dd><dt>Countdown</dt><dd class="cdtxt"></dd></dl>' +
       '<p>Some parishes ask godparents to attend a short seminar or bring a confirmation certificate. We\u2019ll message you if anything is needed.</p>' +
       '<a class="lnk" href="' + CAL + '" target="_blank" rel="noopener">Add to Google Calendar</a><br>' +
       pledgeBtn('Sign the godparent pledge') }
   };
+  var RECEPTION = "Marvilla Beach Resort, Opol", RQ = encodeURIComponent(RECEPTION);
+  var RPICS = [
+    ["static/loc/marvilla-1.webp", "Entrance sign of Marvilla Beach Resort"],
+    ["static/loc/marvilla-2.webp", "A beach hut and a big old tree by the shore"],
+    ["static/loc/marvilla-3.webp", "View of the beach from inside a thatched cottage"],
+    ["static/loc/marvilla-4.webp", "Cottages and shady trees along the sand"]
+  ];
+  SHEETS.reception = { t: "Reception", h:
+    '<div class="pics-wrap"><div class="pics" tabindex="0" aria-label="Photos of the venue">' +
+      RPICS.map(function(p, i){ return '<img src="' + p[0] + '" alt="' + p[1] + '"' + (i ? ' loading="lazy"' : '') + '>'; }).join('') +
+    '</div>' +
+    '<button class="pic-nav prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></svg></button>' +
+    '<button class="pic-nav next" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></button>' +
+    '<div class="pic-dots" aria-hidden="true">' + RPICS.map(function(){ return '<i></i>'; }).join('') + '</div></div>' +
+    '<dl><dt>Place</dt><dd><b>Marvilla Beach Resort</b><br>Opol</dd><dt>Date</dt><dd>Sunday, November 15, 2026</dd></dl>' +
+    '<p class="note">If you wish to swim, you can bring an extra outfit.</p>' +
+    '<div class="vs-map"><iframe title="Map of Marvilla Beach Resort" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="https://www.google.com/maps?q=' + RQ + '&output=embed"></iframe></div>' +
+    '<a class="go" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + RQ + '">Open in Google Maps</a>' +
+    '<a class="go alt" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + RQ + '">Get directions</a>',
+    init: function(root){
+      var box = root.querySelector(".pics"), dots = root.querySelectorAll(".pic-dots i"), n = RPICS.length;
+      function cur(){ return Math.max(0, Math.min(n - 1, Math.round(box.scrollLeft / Math.max(1, box.clientWidth)))); }
+      function sync(){ var c = cur(); Array.prototype.forEach.call(dots, function(d, i){ d.classList.toggle("on", i === c); }); }
+      function go(i){ box.scrollTo({ left: ((i % n) + n) % n * box.clientWidth, behavior: reduce ? "auto" : "smooth" }); }
+      box.addEventListener("scroll", function(){ window.requestAnimationFrame(sync); }, { passive: true });
+      root.querySelector(".pic-nav.prev").addEventListener("click", function(){ go(cur() - 1); });
+      root.querySelector(".pic-nav.next").addEventListener("click", function(){ go(cur() + 1); });
+      box.addEventListener("keydown", function(e){ if (e.key === "ArrowLeft") { e.preventDefault(); go(cur() - 1); } else if (e.key === "ArrowRight") { e.preventDefault(); go(cur() + 1); } });
+      Array.prototype.forEach.call(dots, function(d, i){ d.addEventListener("click", function(){ go(i); }); });
+      sync();
+    } };
+
   function openSheet(key, opener){
     var d = SHEETS[key]; if (!d) return;
     lastOpener = opener || null; sheetT.textContent = d.t; sheetB.innerHTML = d.h; tick();
+    if (d.init) d.init(sheetB);
     sheetBg.hidden = false; sheet.hidden = false;
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ sheetBg.classList.add("show"); sheet.classList.add("show"); document.getElementById("sheetX").focus({preventScroll:true}); }); });
     sheet.scrollTop = 0;
